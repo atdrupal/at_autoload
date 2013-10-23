@@ -3,4 +3,4 @@ description = Module to support PSR-4 class auto loading
 version = 7.x-1.0-dev
 core = 7.x
 
-dependencies[] = go
+dependencies[] = at_autoload

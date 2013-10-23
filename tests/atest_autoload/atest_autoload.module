@@ -1,0 +1,11 @@
+<?php
+/**
+ * @file atest_autoload.module
+ */
+
+/**
+ * Implements hook_go_api()
+ */
+function atest_autoload_go_api() {
+  return array('api' => '1.0');
+}

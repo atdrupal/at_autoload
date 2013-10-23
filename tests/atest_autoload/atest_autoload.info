@@ -1,0 +1,5 @@
+name = Test autoload
+description = 'Make sure at_autoload is working'
+version = 7.x-1.x-module
+core = 7.x
+dependencies[] = at_autoload
