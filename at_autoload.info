@@ -1,7 +1,7 @@
 name = AT Autoload
 description = Module to support PSR-4 class auto loading
-version = 7.x-1.0-beta-1
+version = 7.x-1.0-dev
 core = 7.x
 
 dependencies[] = at_autoload
-files[] = at_autoload.test
+files[] = tests/at_autoload.test
