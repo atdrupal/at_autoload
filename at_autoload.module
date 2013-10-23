@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * @file at_autoload.module
+ *
+ * @author Andy Truong
+ */
+
+/**
+ * You can tell go.module to find your directory by define at_autoload() in your
+ * settings.php
+ */
+if (!function_exists('at_autoload')) {
+  /**
+   * Wrapper for _at_autoload()
+   *
+   * @param  string $class
+   */
+  function at_autoload($class) {
+    return _at_autoload($class);
+  }
+}
+
+/**
+ * Register auto loader.
+ */
+spl_autoload_register('at_autoload');
+
+/**
+ * Implements hook_flush_caches()
+ *
+ * @see at_autoload_get_file()
+ */
+function at_autoload_flush_caches() {
+  if (function_exists('apc_clear_cache')) {
+    apc_clear_cache('user');
+  }
+}
+
+
+/**
+ * Simple PSR-4 autoloader.
+ *
+ *  /path/to/%module/Class.php -> \Drupal\%module\Class
+ *
+ * @param  string $class
+ */
+function _at_autoload($class) {
+  // Only Drupal namespace
+  $supported = strpos($class, 'Drupal\\') !== FALSE;
+
+  if ($supported && $file = at_autoload_get_file($class)) {
+    require_once $file;
+  }
+}
+
+/**
+ * Get autoloading file.
+ *
+ * @param  string $class
+ * @return string Path to file.
+ * @see    at_autoload_flush_caches()
+ */
+function at_autoload_get_file($class, $reset = FALSE) {
+  $apc = function_exists('apc_store');
+  $cid = "at_autoload:{$class}";
+
+  if ($apc && !$reset) {
+    $file = apc_fetch($cid);
+    if (FALSE !== $file) {
+      return $file;
+    }
+  }
+
+  $file = _at_autoload_get_file($class);
+
+  if ($apc) {
+    // apc_fetch return FALSE on failure, that's why we cast FALSE to 0.
+    apc_store($cid, $file ? $file : 0);
+  }
+
+  return $file;
+}
+
+/**
+ * Details implementation for at_autoload_get_file. Heart is here.
+ *
+ * @param  string $class
+ * @return mixed
+ */
+function _at_autoload_get_file($class) {
+  $path = str_replace('\\', DIRECTORY_SEPARATOR, $class);
+  $path = DRUPAL_ROOT . "/%s/lib/{$path}.php";
+
+  foreach (at_get_module_apis() as $module => $info) {
+    if (strpos($path, "Drupal/{$module}/") !== FALSE) {
+      $real_path = str_replace('Drupal' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR, '', $path);
+      $file = sprintf($real_path, drupal_get_path('module', $module));
+      if (file_exists($file)) {
+        return $file;
+      }
+    }
+  }
+
+  return FALSE;
+}
