@@ -1,5 +1,6 @@
 language: php
 php:
+  - 5.3
   - 5.4
 
 mysql:
@@ -8,19 +9,22 @@ mysql:
   encoding: utf8
 
 before_script:
+ - cd ../..
  - mysql -e 'create database drupal;'
- - pyrus channel-discover pear.drush.org
- - pyrus install drush/drush
+ - pear channel-discover pear.drush.org
+ - pear install drush/drush-5.8.0
  - phpenv rehash
  - drush dl --yes drupal
  - cd drupal-*
- - drush si standard --db-url=mysql://root:@localhost/drupal --yes
+ - pwd
+ - ls -lah ../
+ - mv ../andytruong/at_autoload sites/all/modules/
  - cd sites/all/modules
  - git clone https://github.com/andytruong/at_base.git --branch=7.x-1.x
+ - cd ../../..
+ - drush si testing --db-url=mysql://root:@localhost/drupal --yes
  - drush en --yes simpletest at_autoload
  - drush cc all
- - drush runserver --server=builtin 8080 &
- - sleep 4
- - drush vset --yes simpletest_verbose FALSE
+ - sleep 3
 
-script: drush test-run At_Autoload_TestCase --xml --uri=http://127.0.0.1:8080
+script: drush test-run 'Andy Truong'
