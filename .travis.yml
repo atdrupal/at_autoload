@@ -1,0 +1,24 @@
+language: php
+php:
+  - 5.4
+
+mysql:
+  database: drupal
+  username: root
+  encoding: utf8
+
+before_script:
+ - mysql -e 'create database drupal;'
+ - pyrus channel-discover pear.drush.org
+ - pyrus install drush/drush
+ - phpenv rehash
+ - drush dl --yes drupal
+ - cd drupal-*
+ - drush si standard --db-url=mysql://root:@localhost/drupal --yes
+ - drush en --yes simpletest
+ - drush cc all
+ - drush runserver --server=builtin 8080 &
+ - sleep 4
+ - drush vset --yes simpletest_verbose FALSE
+
+script: drush test-run At_Autoload_TestCase --xml --uri=http://127.0.0.1:8080
