@@ -6,4 +6,4 @@ core = 7.x
 dependencies[] = at_base
 dependencies[] = at_autoload
 
-psr4['Drupal\atest_autoload\Other\Prefix'] = 'classes'
+psr4[Drupal\atest_autoload\Other\Prefix] = 'classes'

@@ -27,16 +27,26 @@ if (!function_exists('at_autoload')) {
 spl_autoload_register('at_autoload');
 
 /**
+ * Implements hook_modules_enabled()
+ */
+function at_autoload_modules_enabled($modules) {
+  at_id(new \Drupal\at_autoload\CustomMapping())->rebuild();
+}
+
+/**
  * Implements hook_flush_caches()
  *
  * @see at_autoload_get_file()
  */
 function at_autoload_flush_caches() {
+  // Rebuild the class mapping
+  at_id(new \Drupal\at_autoload\CustomMapping())->rebuild();
+
+  // Flush file-path caching
   if (function_exists('apc_clear_cache')) {
     apc_clear_cache('user');
   }
 }
-
 
 /**
  * Simple PSR-4 autoloader.
@@ -89,6 +99,24 @@ function at_autoload_get_file($class, $reset = FALSE) {
  * @return mixed
  */
 function _at_autoload_get_file($class) {
+  if ($file = _at_autoload_get_file_static($class)) {
+    return $file;
+  }
+
+  if ($file = _at_autoload_get_file_mapping($class)) {
+    return $file;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Find the file path using static option.
+ *
+ * @param  string $class Class name
+ * @return string
+ */
+function _at_autoload_get_file_static($class) {
   $path = str_replace('\\', DIRECTORY_SEPARATOR, $class);
   $path = DRUPAL_ROOT . "/%s/lib/{$path}.php";
 
@@ -102,6 +130,21 @@ function _at_autoload_get_file($class) {
       }
     }
   }
+}
 
-  return FALSE;
+/**
+ * Find the file path using mapping option.
+ * @param  string $class Class name
+ * @return string
+ */
+function _at_autoload_get_file_mapping($class) {
+  foreach (variable_get('at_autoload_mapping', array()) as $ns_prefix => $dir) {
+    if (0 === strpos($class, $ns_prefix)) {
+      $cut_class = substr($class, strlen($ns_prefix) + 1);
+      $file  = DRUPAL_ROOT . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR;
+      $file .= str_replace('\\', DIRECTORY_SEPARATOR, $cut_class);
+      $file .= '.php';
+      return $file;
+    }
+  }
 }
