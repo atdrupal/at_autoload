@@ -1,0 +1,20 @@
+<?php
+
+class At_Autoload_TestCase extends DrupalUnitTestCase {
+  public function getInfo() {
+    return array(
+      'name' => 'AT Autoloader',
+      'description' => "Make sure the autoloader feature is working correctly.",
+      'group' => 'Andy Truong'
+    );
+  }
+
+  protected function setUp() {
+    parent::setUp('atest_autoload');
+  }
+
+  public function testAutoloader() {
+    $this->assertTrue(class_exists('Drupal\atest_autoload\Hello'));
+    $this->assertTrue(class_exists('Drupal\atest_autoload\Other\Prefix\Hi'));
+  }
+}
