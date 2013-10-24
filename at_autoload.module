@@ -92,7 +92,7 @@ function _at_autoload_get_file($class) {
   $path = str_replace('\\', DIRECTORY_SEPARATOR, $class);
   $path = DRUPAL_ROOT . "/%s/lib/{$path}.php";
 
-  foreach (go_get_module_apis() as $module => $info) {
+  foreach (at_modules() as $module) {
     if (strpos($path, "Drupal/{$module}/") !== FALSE) {
       $real_path = str_replace('Drupal' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR, '', $path);
       $file = sprintf($real_path, drupal_get_path('module', $module));
