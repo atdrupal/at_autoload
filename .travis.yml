@@ -15,7 +15,9 @@ before_script:
  - drush dl --yes drupal
  - cd drupal-*
  - drush si standard --db-url=mysql://root:@localhost/drupal --yes
- - drush en --yes simpletest
+ - cd sites/all/modules
+ - git clone https://github.com/andytruong/at_base.git --branch=7.x-1.x
+ - drush en --yes simpletest at_autoload
  - drush cc all
  - drush runserver --server=builtin 8080 &
  - sleep 4
