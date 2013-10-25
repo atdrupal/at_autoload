@@ -5,7 +5,7 @@ class At_Autoload_TestCase extends DrupalWebTestCase {
     return array(
       'name' => 'AT Autoloader',
       'description' => "Make sure the autoloader feature is working correctly.",
-      'group' => 'Andy Truong'
+      'group' => 'AT Autoloader'
     );
   }
 
